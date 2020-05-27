@@ -14,7 +14,7 @@
     <a href="https://discordapp.com/channels/442252698964721669/443151097398296587">Chat</a>
   </h3>
 
-  <sub>Built with 🦀🕸 by <a href="https://rustwasm.github.io/">The Rust and WebAssembly Working Group</a></sub>
+  <sub>Built with by <a href="https://rustwasm.github.io/">The Rust and WebAssembly Working Group</a></sub>
 </div>
 
 ## About
@@ -29,13 +29,13 @@ Rust-generated WebAssembly and using them to create a Website.
   and/or
   [`rust-parcel-template`](https://github.com/rustwasm/rust-parcel-template).
 
-## 🚴 Usage
+## Usage
 
 ```
 npm init wasm-app
 ```
 
-## 🔋 Batteries Included
+## Batteries Included
 
 - `.gitignore`: ignores `node_modules`
 - `LICENSE-APACHE` and `LICENSE-MIT`: most Rust projects are licensed this way, so these are included for you
