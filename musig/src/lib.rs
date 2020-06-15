@@ -1,5 +1,10 @@
-pub mod hash;
-pub mod musig;
-pub mod musig_error;
-pub mod musig_hasher;
-pub mod musig_verifier;
+#![allow(non_snake_case)]
+pub mod signer;
+pub mod verifier;
+pub mod aggregated_pubkey;
+pub mod jubjub;
+pub mod hasher;
+pub mod encoder;
+pub mod errors;
+pub mod util;
+pub mod tests;

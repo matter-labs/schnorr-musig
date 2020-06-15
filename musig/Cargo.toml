@@ -8,10 +8,10 @@ edition = "2018"
 crate-type = ["lib"]
 
 [dependencies]
-franklin_crypto = { package = "franklin-crypto", git = "https://github.com/matter-labs/franklin-crypto.git", branch="check-franklin-circuit-transpile"}
 bellman = { package = "bellman_ce", git = "https://github.com/matter-labs/bellman", branch = "plonk_release" }
+franklin_crypto = { package = "franklin-crypto", git = "https://github.com/matter-labs/franklin-crypto.git", branch="constant_time"}
 sha2 = "0.8.0"
+rand = "0.4.0"
 
 [dev-dependencies]
-rand = "0.4.0"
 hex = "0.4.0"

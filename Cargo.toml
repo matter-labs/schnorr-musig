@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "musig",
-    "musig_wasm",
+    "wasm",
 ]
 
 [profile.release]
