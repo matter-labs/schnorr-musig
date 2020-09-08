@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "types" : ["node", "mocha", "chai", "musig-bindings"],
+        "downlevelIteration": true,
+        "noImplicitAny": false,
+        "outDir": "lib",
+        "rootDir": ".",
+        "lib": [
+            "es2019"
+        ],
+        "typeRoots": [
+            "./node_modules/@types"
+        ],
+    },
+      "include": [
+        "./src/**/*",
+        "./test/**/*",
+      ]
+}

@@ -3,14 +3,13 @@ mod tests{
     use wasm_bindgen_test::*;
     use bellman::{Field, PrimeField, PrimeFieldRepr};
     use franklin_crypto::alt_babyjubjub::AltJubjubBn256;
-    use franklin_crypto::alt_babyjubjub::fs::{Fs, FsRepr};
-    use franklin_crypto::eddsa::{PrivateKey, PublicKey, Signature};
+    use franklin_crypto::alt_babyjubjub::fs::Fs;
+    use franklin_crypto::eddsa::{PrivateKey, PublicKey};
     use franklin_crypto::jubjub::{FixedGenerators};
-    use musig::verifier::MuSigVerifier;
     use bellman::pairing::bn256::{Bn256};
-    use franklin_crypto::jubjub::edwards::Point;
     use musig::errors::MusigError;
     use crate::signer::MusigBN256WasmSigner;
+    use crate::verifier::MusigBN256WasmVerifier;
     use crate::errors::MusigABIError;
     use crate::decoder::STANDARD_ENCODING_LENGTH;
 
@@ -40,15 +39,13 @@ mod tests{
 
     fn musig_wasm_multiparty_full_round(){
         let number_of_parties = 2;
-        let jubjub_params = AltJubjubBn256::new();
-        let rescue_params = franklin_crypto::rescue::bn256::Bn256RescueParams::new_checked_2_into_1();
-        let generator = FixedGenerators::SpendingKeyGenerator;
 
         let message = vec![1,2,3,4,5];
 
         let (privkeys, pubkeys) = musig_wasm_bn256_deterministic_setup(number_of_parties, FixedGenerators::SpendingKeyGenerator).unwrap();
 
         let pubkey_len = STANDARD_ENCODING_LENGTH;
+        let sig_len = 2*STANDARD_ENCODING_LENGTH;
 
         let mut encoded_pubkeys = vec![0u8; number_of_parties*pubkey_len];
 
@@ -114,36 +111,19 @@ mod tests{
             aggregated_signatures.extend_from_slice(&agg_sig);
         }
 
-        assert!(aggregated_signatures.len() == 2*number_of_parties*pubkey_len);
+        assert!(aggregated_signatures.len() == number_of_parties*sig_len);
         
-        let first_agg_sig = aggregated_signatures[..(2*pubkey_len)].to_vec();
+        let first_agg_sig = aggregated_signatures[..sig_len].to_vec();
         
         for position in (0..pubkeys.len()).skip(1){
-            let offset = position * (pubkey_len*2);
-            let sig = aggregated_signatures[(offset)..(offset + pubkey_len)].to_vec();
-            assert_eq!(first_agg_sig[..STANDARD_ENCODING_LENGTH], sig[..]);
+            let offset = position * sig_len;
+            let sig = aggregated_signatures[(offset)..(offset + sig_len)].to_vec();
+            assert_eq!(first_agg_sig[..sig_len], sig[..]);    
+
+            // verify aggregated signature
+            let is_verified = MusigBN256WasmVerifier::verify(&message, &encoded_pubkeys, &sig, position).unwrap();
+            assert!(is_verified);
         }
-
-
-        let signature_r = Point::read(&first_agg_sig[..STANDARD_ENCODING_LENGTH], &jubjub_params).unwrap();
-
-        let mut repr = FsRepr::default();        
-        repr.read_be(&first_agg_sig[STANDARD_ENCODING_LENGTH..]).unwrap();        
-        let signature_s = Fs::from_repr(repr).unwrap();
-        
-        let actual_signature = Signature{r: signature_r, s: signature_s};
-
-        let is_verified = MuSigVerifier::<Bn256>::verify(
-            &message, 
-            &pubkeys, 
-            &actual_signature, 
-            0, 
-            &jubjub_params,
-            generator, 
-            &rescue_params,
-        ).unwrap();
-
-        assert!(is_verified);
     }
 
     #[test]

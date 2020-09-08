@@ -63,6 +63,9 @@ mod tests{
             let signer = MuSigSigner::<Bn256>::new(&pubkeys, position, AltJubjubBn256::new(), generator)?;
             signers.push(signer);
         }
+
+        println!("privkey {:?}", privkeys[0].0);
+        // println!("pubkey {:?}", pubkeys[0].0);
     
         Ok((privkeys, pubkeys, signers))
     }

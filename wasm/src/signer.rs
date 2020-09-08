@@ -34,7 +34,7 @@ impl MusigBN256WasmSigner{
         let generator = FixedGenerators::SpendingKeyGenerator;
         
         let signer = MuSigSigner::new(&pubkeys[..], position, jubjub_params, generator)
-            .map_err(|_| MusigABIError::MuSigError)?;
+            .map_err(|e| JsValue::from(format!("{}", e)))?;
 
         Ok(MusigBN256WasmSigner{
             musig_signer: signer,
@@ -62,7 +62,7 @@ impl MusigBN256WasmSigner{
         let seed = Seed::deterministic_seed(&private_key, message);
 
         let pre_commitment = self.musig_signer.compute_precommitment_with_seed(seed)
-            .map_err(|_| MusigABIError::MuSigError)?;
+            .map_err(|e| JsValue::from(format!("{}", e)))?;
 
         Ok(pre_commitment)
     }
@@ -75,7 +75,7 @@ impl MusigBN256WasmSigner{
         let pre_commitments = Decoder::decode_pre_commitments(input)?;
 
         let nonce_commitment = self.musig_signer.receive_precommitments(&pre_commitments)
-            .map_err(|_| MusigABIError::MuSigError)?;
+            .map_err(|e| JsValue::from(format!("{}", e)))?;
 
         let mut encoded_nonce_commitment = vec![0u8; crate::decoder::STANDARD_ENCODING_LENGTH];
 
@@ -93,7 +93,7 @@ impl MusigBN256WasmSigner{
         let commitments = Decoder::decode_commitments(input)?;
 
         let aggregated_commitment = self.musig_signer.receive_commitments(&commitments)
-            .map_err(|_| MusigABIError::MuSigError)?;
+            .map_err(|e| JsValue::from(format!("{}", e)))?;
 
         let mut encoded_agg_commitment = vec![0u8; crate::decoder::STANDARD_ENCODING_LENGTH];
 
@@ -114,7 +114,7 @@ impl MusigBN256WasmSigner{
         let private_key = Decoder::decode_private_key(private_key_bytes)?;
 
         let signature_share = self.musig_signer.sign(&private_key, message, &rescue_params)
-            .map_err(|_| MusigABIError::MuSigError)?;
+            .map_err(|e| JsValue::from(format!("{}", e)))?;
 
         let mut encoded_sig_share = vec![0u8; crate::decoder::STANDARD_ENCODING_LENGTH];
 
@@ -132,10 +132,10 @@ impl MusigBN256WasmSigner{
         let signature_shares = Decoder::decode_signature_shares(input)?;
 
         let signature = self.musig_signer.receive_signatures(&signature_shares)
-            .map_err(|_| MusigABIError::MuSigError)?;
+            .map_err(|e| JsValue::from(format!("{}", e)))?;
         
         // (R, s)
-        let mut encoded_sig = vec![0u8; 64];
+        let mut encoded_sig = vec![0u8; 2*crate::decoder::STANDARD_ENCODING_LENGTH];
         signature.r.write(&mut encoded_sig[..crate::decoder::STANDARD_ENCODING_LENGTH])
             .map_err(|_| MusigABIError::EncodingError)?;
 

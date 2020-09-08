@@ -1,5 +1,7 @@
 pub mod signer;
+pub mod verifier;
 mod decoder;
+mod utils;
 mod errors;
 mod tests;
 pub use musig::errors::MusigError;

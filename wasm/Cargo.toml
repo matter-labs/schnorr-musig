@@ -1,5 +1,5 @@
 [package]
-name = "wasm_signer"
+name = "musig-bindings"
 version = "0.1.0"
 authors = ["Sait Imamoglu <nuggez@gmail.com>"]
 edition = "2018"

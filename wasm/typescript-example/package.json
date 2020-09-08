@@ -1,0 +1,25 @@
+{
+    "name": "schnorr-musig",
+    "license": "MIT",
+    "dependencies": {
+        "@types/node": "^14.6.4",
+        "musig-bindings": "link:../musig-bindings",
+        "zksync-crypto": "link:/Users/cizir/dev/matter-labs/zksync-dev/js/zksync-crypto"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.2.12",
+        "@types/mocha": "^8.0.3",
+        "chai": "^4.2.0",
+        "mocha": "^8.1.3",
+        "prettier": "^2.1.1",
+        "ts-node": "^9.0.0",
+        "tslint": "^6.1.3",
+        "typescript": "^4.0.2"
+    },
+    "scripts": {
+        "build": "tsc -b",
+        "test": "mocha --require source-map-support/register lib/test/**/*.test.js --exit",
+        "lint:ts": "tslint -c tslint.json test/**/*.ts",
+        "fmt": "prettier --tab-width 4 --print-width 120 --parser typescript --write \"test/*.ts\""
+    }
+}
