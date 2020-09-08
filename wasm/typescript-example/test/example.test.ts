@@ -23,7 +23,7 @@ describe("Schnorr-MuSig", function () {
     let number_of_participants = 3;
     const NUM_BYTES = 32;
 
-    function concat_array(elements: [][], isSig = false): Uint8Array {
+    function merge_array(elements: [][], isSig = false): Uint8Array {
         let buffer_size = isSig ? 2 * NUM_BYTES : NUM_BYTES;
         let buffer = new Uint8Array(number_of_participants * buffer_size);
         for (let i = 0; i < elements.length; i++) {
@@ -38,7 +38,7 @@ describe("Schnorr-MuSig", function () {
             pubkeys[i] = private_key_to_pubkey(privkeys[i]);
         }
 
-        let all_pubkeys = concat_array(pubkeys);
+        let all_pubkeys = merge_array(pubkeys);
 
         for (let i = 0; i < number_of_participants; i++) {
             signers[i] = MusigBN256WasmSigner.new(all_pubkeys, i);
@@ -51,13 +51,13 @@ describe("Schnorr-MuSig", function () {
         }
     });
     it("should receive pre-commitments and return commitments", function () {
-        let all_pre_commitments = concat_array(pre_commitments);
+        let all_pre_commitments = merge_array(pre_commitments);
         for (let i = 0; i < number_of_participants; i++) {
             commitments[i] = signers[i].receive_precommitments(all_pre_commitments, message);
         }
     });
     it("should receive commitments and return aggregated commitments", function () {
-        let all_commitments = concat_array(commitments);
+        let all_commitments = merge_array(commitments);
         for (let i = 0; i < number_of_participants; i++) {
             aggregated_commitments[i] = signers[i].receive_commitments(all_commitments);
         }
@@ -69,13 +69,13 @@ describe("Schnorr-MuSig", function () {
     });
 
     it("should receive each signature shares", function () {
-        let all_signature_shares = concat_array(signature_shares);
+        let all_signature_shares = merge_array(signature_shares);
         for (let i = 0; i < number_of_participants; i++) {
             aggregated_signatures[i] = signers[i].receive_signature_shares(all_signature_shares);
         }
     });
     it("should verify each aggregated signatures", function () {
-        let all_pubkeys = concat_array(pubkeys);
+        let all_pubkeys = merge_array(pubkeys);
         for (let i = 0; i < number_of_participants; i++) {
             let is_valid = MusigBN256WasmVerifier.verify(message, all_pubkeys, aggregated_signatures[i], i);
             expect(is_valid).eq(true);
