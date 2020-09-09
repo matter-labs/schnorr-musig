@@ -1,7 +1,7 @@
 use bellman::{PrimeField, PrimeFieldRepr};
-use franklin_crypto::jubjub::{JubjubEngine, Unknown};
 use franklin_crypto::eddsa::PublicKey;
 use franklin_crypto::jubjub::edwards::Point;
+use franklin_crypto::jubjub::{JubjubEngine, Unknown};
 use std::marker::PhantomData;
 
 // each encoded elements(point, scalar, pubkey) needs to have 32byte size
@@ -17,15 +17,15 @@ pub fn write_point<E: JubjubEngine>(point: &Point<E, Unknown>, dest: &mut Vec<u8
     dest.extend_from_slice(&x_bytes);
 }
 
-pub struct Encoder<E: JubjubEngine>{
-    marker: PhantomData<E>
+pub struct Encoder<E: JubjubEngine> {
+    marker: PhantomData<E>,
 }
 
-impl<E: JubjubEngine> Encoder<E>{
+impl<E: JubjubEngine> Encoder<E> {
     // H_agg(L, X_i)
     pub(crate) fn encode_aggregated_data(pubkeys: &[PublicKey<E>], position: usize) -> Vec<u8> {
         let mut buf = vec![];
-        for pubkey in pubkeys{
+        for pubkey in pubkeys {
             write_point(&pubkey.0, &mut buf);
         }
         // append pubkey of actual signer
@@ -44,17 +44,17 @@ impl<E: JubjubEngine> Encoder<E>{
 
     // H_sig(X', R, m)
     pub(crate) fn encode_signature_data(
-        aggregated_pubkey: &PublicKey<E>, 
-        aggregated_commitment: &Point<E, Unknown>, 
-        message: &[u8]
+        aggregated_pubkey: &PublicKey<E>,
+        aggregated_commitment: &Point<E, Unknown>,
+        message: &[u8],
     ) -> (Vec<u8>, Vec<u8>) {
         let mut buf = vec![];
-    
+
         let aggregated_pubkey = aggregated_pubkey.0.clone();
-    
+
         write_point(&aggregated_pubkey, &mut buf);
         write_point(&aggregated_commitment, &mut buf);
-    
+
         let mut msg_padded: Vec<u8> = message.to_vec();
         msg_padded.resize(STANDARD_ENCODING_LENGTH, 0u8);
 

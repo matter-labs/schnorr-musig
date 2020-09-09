@@ -18,6 +18,7 @@
     },
     "scripts": {
         "build": "tsc -b",
+        "clean": "rm -rf lib/*",
         "test": "mocha --require source-map-support/register lib/test/**/*.test.js --exit",
         "lint:ts": "tslint -c tslint.json test/**/*.ts",
         "fmt": "prettier --tab-width 4 --print-width 120 --parser typescript --write \"test/*.ts\""

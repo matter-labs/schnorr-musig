@@ -1,9 +1,10 @@
-pub mod signer;
-pub mod verifier;
 mod decoder;
-mod utils;
 mod errors;
+pub mod signer;
+#[cfg(test)]
 mod tests;
+pub mod verifier;
+
 pub use musig::errors::MusigError;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
