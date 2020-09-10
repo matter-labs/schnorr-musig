@@ -1,7 +1,7 @@
 [package]
 name = "musig"
 version = "0.1.0"
-authors = ["Oleksandr Deundiak <deundiak@gmail.com>"]
+authors = ["Matter Labs Team <hello@matter-labs.io>"]
 edition = "2018"
 
 [lib]

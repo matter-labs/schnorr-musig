@@ -4,6 +4,7 @@ use bellman::{Field, PrimeField};
 use franklin_crypto::eddsa::PublicKey;
 use franklin_crypto::jubjub::edwards::Point;
 use franklin_crypto::jubjub::{JubjubEngine, ToUniform};
+
 pub struct AggregatedPublicKey;
 
 impl AggregatedPublicKey {
