@@ -4,6 +4,7 @@ pub mod signer;
 #[cfg(test)]
 mod tests;
 pub mod verifier;
+pub mod aggregated_pubkey;
 
 pub use musig::errors::MusigError;
 

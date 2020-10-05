@@ -4,7 +4,7 @@ This is a Rust implementation of [MuSig](https://eprint.iacr.org/2018/068.pdf) s
 ## MuSig 
 MuSig is effectively a multi-signature and key-aggregation scheme based on Schnorr Signatures. It provides security in plain public key model.  For overview one can visit [article written by Blockstream](https://blockstream.com/2018/01/23/en-musig-key-aggregation-schnorr-signatures/).
 
-### Protocol
+### Protocol 
 In order to produce a valid joint signature, each party needs to follow following steps:
 
 1. Signer receives all public keys `[X_1..X_n]` and stores aggregated public key `X'`.
@@ -15,6 +15,74 @@ In order to produce a valid joint signature, each party needs to follow followin
 and computes his signature share by blinding the private key `x_i` using the nonce and the challenge: `s_i = r_i + c·x_i`.
 7. Signer receive signature shares `[s1..sn]` and computes aggregated signature if all signature shares are valid.
 8. Verifier checks the relation: `s·B  ==  R + c·X'` where `B` is group generator.
+
+
+## Client Broker Communication
+- Each client generate his own keypair and sends it public key to the server/broker
+- Server collects each parties public-keys and sends a tuple `(list_of_all_public_keys, position)`  to all clients
+- Then, signing ceremony starts as follows:
+    1. client initializes signer instance by calling ` let signer = MusigBN256WasmSigner.new(all_pubkeys, position)`
+    2. client generates a 128-bytes random seed and computes his pre-commitment `let pre_commitment = signers.compute_precommitment(seed)` then sends his pre commitment to the server
+    3. server receives and sends all pre commitment to all clients
+    4. client reveals his commitment `let commitment = signer.receive_precommitments(all_pre_commitments)` and  sends it to the server
+    5. server collects and sends each commitment to all clients(does server also need to aggregate commitments?)
+    6. client computes aggregated commitment by calling `let aggregated_commitment = signer.receive_commitments(all_commitments)` and sends it to the server
+    7. server collects each aggregated commitment and server sends aggregated commitment ot all clients if each received aggregated commitments are same
+    8. client produces signature share `let signature_share = signer.sign(privkeys[i], message)` and sends it to the server
+    9. server collects all shares and sends them to all clients
+    10. client computes aggregated signature `let aggregated_signature = signer.receive_signature_shares(all_signature_shares)` and sends it to the server
+    11. server collects all aggregated signatures and send a "SIGNING CEREMONY FINISHED " message to all clients if all signatures are valid
+
+
+## Client Broker Communication 1
+Musig signing basically consists of four rounds: 
+1. All signers send pre-commitments t_i
+2. All signers reveal commitments, R_i and all parties verify that t_i = H(R_i)
+3. All signers compute and send their signature shares s_i
+
+### Setup
+- Each client generate his own keypair and sends it public key to the server/broker
+- Server collects each parties public-keys and sends a "SIGNING CEREMONY STARTED" message which containts `(list_of_all_public_keys, position)` to all clients
+- Client initializes signer instance by calling `let signer = MusigBN256WasmSigner.new(all_pubkeys, position)`
+
+### Signing
+
+#### Round 1    
+
+    1. client generates a 128-bytes random seed and computes his pre-commitment `let pre_commitment = signers.compute_precommitment(seed)` then sends his pre commitment to the server
+    2. server receives and sends all pre commitment to all clients
+
+#### Round 2
+    1. client reveals his commitment `let commitment = signer.receive_precommitments(all_pre_commitments)` and  sends it to the server
+    2. server collects and sends each commitment to all clients
+    3. client computes aggregated commitment by calling `let aggregated_commitment = signer.receive_commitments(all_commitments)` and sends it to the server
+    4. server collects each aggregated commitment and server sends aggregated commitment to all clients (check that each agg commitments are same)
+
+#### Round 3
+    1. client produces signature share `let signature_share = signer.sign(private_key, message)` and sends it to the server
+    2. server collects all shares and sends them to all clients
+    3. client computes aggregated signature `let aggregated_signature = signer.receive_signature_shares(all_signature_shares)` and sends it to the server
+    11. server collects all aggregated signatures and send a "SIGNING CEREMONY FINISHED " message to all clients (check that each agg signature are same)
+
+
+## Client Broker Communication 2
+### Setup
+- Each client generate his own keypair and sends it public key to the server/broker
+- Server collects each parties public-keys and sends a message which containts `(list_of_all_public_keys, position)`  to all clients
+
+### Signing
+- Then, signing ceremony starts as follows:
+    1. client initializes signer instance by calling ` let signer = MusigBN256WasmSigner.new(all_pubkeys, position)`
+    2. client generates a 128-bytes random seed and computes his pre-commitment `let pre_commitment = signers.compute_precommitment(seed)` then sends his pre commitment to the server
+    3. server receives and sends all pre commitment to all clients
+    4. client reveals his commitment `let commitment = signer.receive_precommitments(all_pre_commitments)` and  sends it to the server
+    5. **server collects and all commitments, computes aggregated commitments and sends it to all clients**
+    8. client produces signature share `let signature_share = signer.sign(privkeys[i], message)` and sends it to the server
+    9. server collects all shares and sends them to all clients
+    10. client computes aggregated signature `let aggregated_signature = signer.receive_signature_shares(all_signature_shares)` and sends it to the server
+    11. server collects all aggregated signatures and send a "SIGNING CEREMONY FINISHED " message to all clients if all signatures are valid
+
+
 
 ## Rust
 ### Definitions

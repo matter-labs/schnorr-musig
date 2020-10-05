@@ -32,8 +32,8 @@ mod tests {
         let rng = &mut XorShiftRng::from_seed([0x3dbe6259, 0x8d313d76, 0x3237db17, 0xe5bc0654]);
 
         let jubjub_params = AltJubjubBn256::new();
-        let rescue_params = Bn256RescueParams::new_checked_2_into_1();
         let generator = FixedGenerators::SpendingKeyGenerator;
+        let rescue_params = Bn256RescueParams::new_checked_2_into_1();
 
         let message = random_message_hash(rng);
 
@@ -170,12 +170,11 @@ mod tests {
             assert!(first_signature.s.eq(&sig.s));
         });
 
-        for (position, signature) in aggregated_signatures.iter().enumerate() {
+        for signature in aggregated_signatures {
             let is_verified = MuSigVerifier::verify(
                 &message,
                 &pubkeys,
-                signature,
-                position,
+                &signature,
                 &jubjub_params,
                 generator,
                 &rescue_params,

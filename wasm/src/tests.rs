@@ -153,7 +153,7 @@ mod tests {
 
             // verify aggregated signature
             let is_verified =
-                MusigBN256WasmVerifier::verify(&message, &encoded_pubkeys, &sig, position).unwrap();
+                MusigBN256WasmVerifier::verify(&message, &encoded_pubkeys, &sig).unwrap();
             assert!(is_verified);
         }
     }

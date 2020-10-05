@@ -17,13 +17,12 @@ impl<E: JubjubEngine + RescueEngine> MuSigVerifier<E> {
         message: &[u8],
         pubkeys: &[PublicKey<E>],
         signature: &Signature<E>,
-        position: usize,
         jubjub_params: &<E as JubjubEngine>::Params,
         generator: FixedGenerators,
         rescue_params: &<E as RescueEngine>::Params,
     ) -> Result<bool, MusigError> {
         let (aggregated_pubkey, _) =
-            AggregatedPublicKey::compute_from_pubkeys(pubkeys, position, jubjub_params)?;
+            AggregatedPublicKey::compute_from_pubkeys(pubkeys, jubjub_params)?;
 
         Ok(aggregated_pubkey.verify_musig_rescue(
             message,

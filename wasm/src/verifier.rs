@@ -17,7 +17,6 @@ impl MusigBN256WasmVerifier {
         message: &[u8],
         encoded_pubkeys: &[u8],
         encoded_signature: &[u8],
-        position: usize,
     ) -> Result<bool, JsValue> {
         let jubjub_params = AltJubjubBn256::new();
         let generator = FixedGenerators::SpendingKeyGenerator;
@@ -43,7 +42,6 @@ impl MusigBN256WasmVerifier {
             message,
             &pubkeys,
             &signature,
-            position,
             &jubjub_params,
             generator,
             &rescue_params,

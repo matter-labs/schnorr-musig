@@ -38,7 +38,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
 
         // we need each a_i values for signature share verification
         let (aggregated_pubkey, a_values) =
-            AggregatedPublicKey::compute_from_pubkeys(pubkeys, position, &jubjub_wrapper.params)?;
+            AggregatedPublicKey::compute_from_pubkeys(pubkeys, &jubjub_wrapper.params)?;
 
         Ok(Self {
             position,
@@ -55,6 +55,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
             jubjub_wrapper: jubjub_wrapper,
         })
     }
+  
 
     /// Pre-commitment is hash of serialized point which computed
     /// by multiplication of a randomly generated scalar with generator.
