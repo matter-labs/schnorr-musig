@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+     - '*'
+
+jobs:
+  ci:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: rust-lints
+      run: |
+        cargo fmt -- --check
+        cargo clippy --all --tests -- -D warnings
+
+    - name: ts-lints
+      run: |
+        cd wasm/typescript-example
+        yarn
+        yarn lint
+        yarn fmt --check
+
+    - name: rust-tests
+      run: cargo test
+
+    - name: ts-tests
+      run: |
+        cd wasm && ./build.sh
+        cd typescript-example && yarn test
