@@ -31,7 +31,8 @@ impl AggregatedPublicKey {
             return Ok((pubkeys[0].clone(), vec![E::Fs::one()]));
         }
 
-        let (aggregated_pubkey, a_values) = Self::compute_aggregated_key_and_a_values(pubkeys, jubjub_params);
+        let (aggregated_pubkey, a_values) =
+            Self::compute_aggregated_key_and_a_values(pubkeys, jubjub_params);
 
         Ok((aggregated_pubkey, a_values))
     }
@@ -43,7 +44,7 @@ impl AggregatedPublicKey {
         if pubkeys.is_empty() {
             return Err(MusigError::InvalidPubkeyLength);
         }
-        
+
         for pubkey in pubkeys {
             // check that pubkey is in correct subgroup
             if pubkey.0.mul(E::Fs::char(), jubjub_params) != Point::zero() {
@@ -59,7 +60,8 @@ impl AggregatedPublicKey {
             return Ok((pubkeys[0].clone(), vec![E::Fs::one()]));
         }
 
-        let (aggregated_pubkey, a_values) = Self::compute_aggregated_key_and_a_values(pubkeys, jubjub_params);
+        let (aggregated_pubkey, a_values) =
+            Self::compute_aggregated_key_and_a_values(pubkeys, jubjub_params);
 
         Ok((aggregated_pubkey, a_values))
     }
@@ -67,7 +69,7 @@ impl AggregatedPublicKey {
     fn compute_aggregated_key_and_a_values<E: JubjubEngine>(
         pubkeys: &[PublicKey<E>],
         jubjub_params: &<E as JubjubEngine>::Params,
-    ) -> (PublicKey<E>, Vec<E::Fs>){
+    ) -> (PublicKey<E>, Vec<E::Fs>) {
         // L = {X_1, X_2, .. X_n}
         let mut a_values = vec![];
         let mut acc = Point::zero();

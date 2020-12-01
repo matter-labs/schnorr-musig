@@ -55,7 +55,6 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
             jubjub_wrapper,
         })
     }
-  
 
     /// Pre-commitment is hash of serialized point which computed
     /// by multiplication of a randomly generated scalar with generator.
