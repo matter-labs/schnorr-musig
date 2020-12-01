@@ -40,6 +40,10 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
         let (aggregated_pubkey, a_values) =
             AggregatedPublicKey::compute_from_pubkeys(pubkeys, &jubjub_wrapper.params)?;
 
+        if position > pubkeys.len() - 1 {
+            return Err(MusigError::InvalidParticipantPosition);
+        }
+
         Ok(Self {
             position,
             nonce: None,

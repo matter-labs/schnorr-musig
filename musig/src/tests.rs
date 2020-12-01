@@ -187,6 +187,7 @@ fn musig_multi_party_test_runner<E: JubjubEngine + RescueEngine>(
 
 #[test]
 fn test_musig_api_errors() {
+    #[derive(Debug)]
     enum ComputationRound {
         Setup,
         ReceivePreCommitmentsWithoutPreviousRound,
@@ -206,6 +207,15 @@ fn test_musig_api_errors() {
         private_key: Option<&'a PrivateKey<Bn256>>,
         message: Option<&'a [u8]>,
         signature_shares: Option<&'a [Fs]>,
+    }
+
+    impl<'a> std::fmt::Debug for TestInput<'a>{
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result{
+            f.debug_struct("TestInput")
+            .field("round", &self.round)
+            .field("expected error", &self.expected_error)
+            .finish()
+        }
     }
 
     let number_of_parties = 2;
@@ -310,7 +320,7 @@ fn test_musig_api_errors() {
                 );
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
-                    _ => panic!("expected error not received"),
+                    _ => panic!("expected error not received for {:?} received success", input),
                 }
             }
             ComputationRound::ReceivePreCommitmentsWithoutPreviousRound => {
@@ -324,7 +334,7 @@ fn test_musig_api_errors() {
                 let result = signer.receive_precommitments(&[]);
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
-                    _ => panic!("expected error not received"),
+                    _ => panic!("expected error not received for {:?}", input),
                 }
             }
             ComputationRound::ReceivePreCommitments => {
@@ -339,7 +349,7 @@ fn test_musig_api_errors() {
                 let result = signer.receive_precommitments(&[]);
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
-                    _ => panic!("expected error not received"),
+                    _ => panic!("expected error not received for {:?}", input),
                 }
             }
             ComputationRound::ReceiveCommitmentsWithoutPreviousRound => {
@@ -353,7 +363,7 @@ fn test_musig_api_errors() {
                 let result = signer.receive_commitments(&[]);
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
-                    _ => panic!("expected error not received"),
+                    _ => panic!("expected error not received for {:?}", input),
                 }
             }
             ComputationRound::ReceiveCommitments => {
@@ -371,7 +381,7 @@ fn test_musig_api_errors() {
                 let result = signer.receive_commitments(&[]);
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
-                    _ => panic!("expected error not received"),
+                    _ => panic!("expected error not received for {:?}", input),
                 }
             }
             ComputationRound::SignWithoutPreviousRound => {
@@ -393,7 +403,7 @@ fn test_musig_api_errors() {
                 );
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
-                    _ => panic!("expected error not received"),
+                    _ => panic!("expected error not received for {:?}", input),
                 }
             }
             ComputationRound::ReceiveSignatureSharesWithoutPreviousRound => {
@@ -414,7 +424,7 @@ fn test_musig_api_errors() {
                 let result = signer.receive_signatures(&[]);
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
-                    _ => panic!("expected error not received"),
+                    _ => panic!("expected error not received for {:?}", input),
                 }
             }
             ComputationRound::ReceiveSignatureShares => {
@@ -442,7 +452,7 @@ fn test_musig_api_errors() {
                 let result = signer.receive_signatures(input.signature_shares.unwrap());
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
-                    _ => panic!("expected error not received"),
+                    _ => panic!("expected error not received for {:?}", input),
                 }
             }
         }
