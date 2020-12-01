@@ -7,7 +7,7 @@ on:
 
 jobs:
   ci:
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
 
     steps:
     - uses: actions/checkout@v2
@@ -20,6 +20,7 @@ jobs:
     - name: ts-lints
       run: |
         cd wasm/typescript-example
+        yarn
         yarn lint
         yarn fmt --check
 
@@ -29,4 +30,4 @@ jobs:
     - name: ts-tests
       run: |
         cd wasm && ./build.sh
-        cd typescript-exmaple && yarn test
+        cd typescript-example && yarn test
