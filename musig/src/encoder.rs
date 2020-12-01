@@ -50,7 +50,7 @@ impl<E: JubjubEngine> Encoder<E> {
     ) -> (Vec<u8>, Vec<u8>) {
         let mut buf = vec![];
 
-        let aggregated_pubkey = aggregated_pubkey.0.clone();
+        let aggregated_pubkey = aggregated_pubkey.0;
 
         write_point(&aggregated_pubkey, &mut buf);
         write_point(&aggregated_commitment, &mut buf);

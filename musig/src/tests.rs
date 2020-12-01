@@ -79,6 +79,7 @@ fn test_musig_multiparty_full_round() {
     .is_ok());
 }
 
+#[allow(clippy::type_complexity)]
 pub fn musig_test_bn256_setup(
     number_of_participants: usize,
 ) -> Result<
@@ -114,6 +115,7 @@ pub fn musig_test_bn256_setup(
     Ok((privkeys, pubkeys, signers))
 }
 
+#[allow(clippy::too_many_arguments)]
 fn musig_multi_party_test_runner<E: JubjubEngine + RescueEngine>(
     rng: &mut impl Rng,
     message: &[u8],
@@ -141,7 +143,7 @@ fn musig_multi_party_test_runner<E: JubjubEngine + RescueEngine>(
         aggregated_commitments[position] = signer.receive_commitments(&commitments)?;
     }
 
-    let first_commitment = aggregated_commitments[0].clone();
+    let first_commitment = aggregated_commitments[0];
     aggregated_commitments
         .iter()
         .for_each(|commitment| assert!(first_commitment.eq(commitment)));
