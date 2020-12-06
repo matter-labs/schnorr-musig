@@ -26,8 +26,6 @@ pub enum MusigError {
     InvalidParticipantPosition,
     #[error("Aggregated commitment is not computed")]
     AggregatedNonceCommitmentNotComputed,
-    #[error("Challenge for fiat-shamir transform is not generated")]
-    ChallengeNotGenerated,
     #[error("Signature is not verified")]
     InvalidSignatureShare,
     #[error("Seed length must be 128 bytes")]

@@ -130,7 +130,7 @@ fn musig_multi_party_test_runner<E: JubjubEngine + RescueEngine>(
 
     let mut pre_commitments = vec![vec![]; number_of_participants];
     for (position, signer) in signers.iter_mut().enumerate() {
-        pre_commitments[position] = signer.compute_precommitment(rng)?;
+        pre_commitments[position] = signer.compute_precommitment(rng);
     }
 
     let mut commitments = vec![Point::zero(); number_of_participants];
@@ -149,8 +149,11 @@ fn musig_multi_party_test_runner<E: JubjubEngine + RescueEngine>(
         .for_each(|commitment| assert!(first_commitment.eq(commitment)));
 
     let mut signature_shares = vec![E::Fs::zero(); number_of_participants];
+    let mut challenge = E::Fs::zero();
     for (position, signer) in signers.iter_mut().enumerate() {
-        signature_shares[position] = signer.sign(&privkeys[position], &message, &rescue_params)?;
+        let sig_and_challenge = signer.sign(&privkeys[position], &message, &rescue_params)?;
+        signature_shares[position] = sig_and_challenge.0;
+        challenge = sig_and_challenge.1;
     }
 
     let mut aggregated_signatures = vec![
@@ -161,7 +164,8 @@ fn musig_multi_party_test_runner<E: JubjubEngine + RescueEngine>(
         number_of_participants
     ];
     for (position, signer) in signers.iter_mut().enumerate() {
-        aggregated_signatures[position] = signer.receive_signatures(&signature_shares)?;
+        aggregated_signatures[position] =
+            signer.receive_signatures(&signature_shares, &challenge)?;
     }
 
     let first_signature = aggregated_signatures[0].clone();
@@ -195,7 +199,6 @@ fn test_musig_api_errors() {
         ReceiveCommitmentsWithoutPreviousRound,
         ReceiveCommitments,
         SignWithoutPreviousRound,
-        ReceiveSignatureSharesWithoutPreviousRound,
         ReceiveSignatureShares,
     }
 
@@ -209,12 +212,12 @@ fn test_musig_api_errors() {
         signature_shares: Option<&'a [Fs]>,
     }
 
-    impl<'a> std::fmt::Debug for TestInput<'a>{
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result{
+    impl<'a> std::fmt::Debug for TestInput<'a> {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             f.debug_struct("TestInput")
-            .field("round", &self.round)
-            .field("expected error", &self.expected_error)
-            .finish()
+                .field("round", &self.round)
+                .field("expected error", &self.expected_error)
+                .finish()
         }
     }
 
@@ -290,15 +293,6 @@ fn test_musig_api_errors() {
             signature_shares: None,
         },
         TestInput {
-            round: ComputationRound::ReceiveSignatureSharesWithoutPreviousRound,
-            expected_error: MusigError::ChallengeNotGenerated,
-            pubkeys: &pubkeys,
-            position: 0,
-            private_key: Some(&privkeys[0]),
-            message: Some(&[1, 2, 3]),
-            signature_shares: Some(&[]),
-        },
-        TestInput {
             round: ComputationRound::ReceiveSignatureShares,
             expected_error: MusigError::SignatureShareAndParticipantsNotMatch,
             pubkeys: &pubkeys,
@@ -320,7 +314,10 @@ fn test_musig_api_errors() {
                 );
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
-                    _ => panic!("expected error not received for {:?} received success", input),
+                    _ => panic!(
+                        "expected error not received for {:?} received success",
+                        input
+                    ),
                 }
             }
             ComputationRound::ReceivePreCommitmentsWithoutPreviousRound => {
@@ -345,7 +342,7 @@ fn test_musig_api_errors() {
                     generator,
                 )
                 .unwrap();
-                let _ = signer.compute_precommitment(rng).unwrap();
+                let _ = signer.compute_precommitment(rng);
                 let result = signer.receive_precommitments(&[]);
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
@@ -374,7 +371,7 @@ fn test_musig_api_errors() {
                     generator,
                 )
                 .unwrap();
-                let pre_commitment = signer.compute_precommitment(rng).unwrap();
+                let pre_commitment = signer.compute_precommitment(rng);
                 let _ = signer
                     .receive_precommitments(&[pre_commitment.clone(), pre_commitment])
                     .unwrap();
@@ -392,7 +389,7 @@ fn test_musig_api_errors() {
                     generator,
                 )
                 .unwrap();
-                let pre_commitment = signer.compute_precommitment(rng).unwrap();
+                let pre_commitment = signer.compute_precommitment(rng);
                 let _ = signer
                     .receive_precommitments(&[pre_commitment.clone(), pre_commitment])
                     .unwrap();
@@ -406,27 +403,6 @@ fn test_musig_api_errors() {
                     _ => panic!("expected error not received for {:?}", input),
                 }
             }
-            ComputationRound::ReceiveSignatureSharesWithoutPreviousRound => {
-                let mut signer = MuSigSigner::new(
-                    input.pubkeys,
-                    input.position,
-                    AltJubjubBn256::new(),
-                    generator,
-                )
-                .unwrap();
-                let pre_commitment = signer.compute_precommitment(rng).unwrap();
-                let commitment = signer
-                    .receive_precommitments(&[pre_commitment.clone(), pre_commitment])
-                    .unwrap();
-                let _ = signer
-                    .receive_commitments(&[commitment, commitment])
-                    .unwrap();
-                let result = signer.receive_signatures(&[]);
-                match result {
-                    Err(e) => assert_eq!(e, input.expected_error),
-                    _ => panic!("expected error not received for {:?}", input),
-                }
-            }
             ComputationRound::ReceiveSignatureShares => {
                 let mut signer = MuSigSigner::new(
                     input.pubkeys,
@@ -435,21 +411,21 @@ fn test_musig_api_errors() {
                     generator,
                 )
                 .unwrap();
-                let pre_commitment = signer.compute_precommitment(rng).unwrap();
+                let pre_commitment = signer.compute_precommitment(rng);
                 let commitment = signer
                     .receive_precommitments(&[pre_commitment.clone(), pre_commitment])
                     .unwrap();
                 let _ = signer
                     .receive_commitments(&[commitment, commitment])
                     .unwrap();
-                let _ = signer
+                let (_, challenge) = signer
                     .sign(
                         input.private_key.unwrap(),
                         input.message.unwrap(),
                         &rescue_params,
                     )
                     .unwrap();
-                let result = signer.receive_signatures(input.signature_shares.unwrap());
+                let result = signer.receive_signatures(input.signature_shares.unwrap(), &challenge);
                 match result {
                     Err(e) => assert_eq!(e, input.expected_error),
                     _ => panic!("expected error not received for {:?}", input),

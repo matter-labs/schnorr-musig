@@ -15,7 +15,7 @@ pub struct Decoder;
 impl Decoder {
     pub fn decode_private_key(input: &[u8]) -> Result<PrivateKey<Bn256>, MusigABIError> {
         let privkey_len = STANDARD_ENCODING_LENGTH;
-        if input.is_empty() || input.len() % privkey_len != 0 {
+        if input.len() != privkey_len {
             return Err(MusigABIError::InvalidInputData);
         }
         let mut privkey_repr = FsRepr::default();
@@ -97,6 +97,17 @@ impl Decoder {
         }
 
         Ok(signature_shares)
+    }
+
+    pub fn decode_challenge(input: &[u8]) -> Result<Fs, MusigABIError> {
+        let challenge_len = STANDARD_ENCODING_LENGTH;
+        if input.len() != challenge_len {
+            return Err(MusigABIError::InvalidInputData);
+        }
+        let mut repr = FsRepr::default();
+        repr.read_be(&input[..]).unwrap();
+        let challenge = Fs::from_repr(repr).unwrap();
+        Ok(challenge)
     }
 }
 

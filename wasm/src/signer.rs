@@ -46,10 +46,7 @@ impl MusigBN256WasmSigner {
         }
         let mut rng = rand::ChaChaRng::from_seed(seed);
 
-        let pre_commitment = self
-            .musig_signer
-            .compute_precommitment(&mut rng)
-            .map_err(|e| JsValue::from(format!("{}", e)))?;
+        let pre_commitment = self.musig_signer.compute_precommitment(&mut rng);
 
         Ok(pre_commitment)
     }
@@ -97,28 +94,41 @@ impl MusigBN256WasmSigner {
 
         let private_key = Decoder::decode_private_key(private_key_bytes)?;
 
-        let signature_share = self
+        let share_and_challenge = self
             .musig_signer
             .sign(&private_key, message, &rescue_params)
             .map_err(|e| JsValue::from(format!("{}", e)))?;
 
-        let mut encoded_sig_share = vec![0u8; crate::decoder::STANDARD_ENCODING_LENGTH];
+        let length = crate::decoder::STANDARD_ENCODING_LENGTH;
+        let mut result = vec![0u8; 2 * length];
 
-        signature_share
+        share_and_challenge
+            .0
             .into_repr()
-            .write_be(&mut encoded_sig_share[..])
+            .write_be(&mut result[..length])
             .map_err(|_| MusigABIError::EncodingError)?;
 
-        Ok(encoded_sig_share)
+        share_and_challenge
+            .1
+            .into_repr()
+            .write_be(&mut result[length..])
+            .map_err(|_| MusigABIError::EncodingError)?;
+
+        Ok(result)
     }
 
     #[wasm_bindgen]
-    pub fn receive_signature_shares(&self, input: &[u8]) -> Result<Vec<u8>, JsValue> {
+    pub fn receive_signature_shares(
+        &self,
+        input: &[u8],
+        challenge: &[u8],
+    ) -> Result<Vec<u8>, JsValue> {
         let signature_shares = Decoder::decode_signature_shares(input)?;
+        let challenge = Decoder::decode_challenge(challenge)?;
 
         let signature = self
             .musig_signer
-            .receive_signatures(&signature_shares)
+            .receive_signatures(&signature_shares, &challenge)
             .map_err(|e| JsValue::from(format!("{}", e)))?;
 
         // (R, s)

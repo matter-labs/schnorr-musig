@@ -19,8 +19,6 @@ pub struct MuSigSigner<E: JubjubEngine + RescueEngine> {
     aggregated_pubkey: PublicKey<E>,
     a_values: Vec<E::Fs>,
     pre_commitments: Option<Vec<Vec<u8>>>,
-    signature: E::Fs,
-    challenge: Option<E::Fs>,
     pubkeys: Vec<PublicKey<E>>,
     jubjub_wrapper: JubJubWrapper<E>,
 }
@@ -53,8 +51,6 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
             aggregated_pubkey,
             a_values,
             pre_commitments: None,
-            signature: E::Fs::zero(),
-            challenge: None,
             pubkeys: pubkeys.to_vec(),
             jubjub_wrapper,
         })
@@ -63,7 +59,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
     /// Pre-commitment is hash of serialized point which computed
     /// by multiplication of a randomly generated scalar with generator.
     /// rng must be a cryptographically secure one.
-    pub fn compute_precommitment(&mut self, rng: &mut impl Rng) -> Result<Vec<u8>, MusigError> {
+    pub fn compute_precommitment(&mut self, rng: &mut impl Rng) -> Vec<u8> {
         let r = E::Fs::rand(rng);
         // R = r*G
         // constant-time multiplication
@@ -75,7 +71,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
         self.nonce = Some(r);
         self.nonce_commitment = Some(R);
 
-        Ok(pre_commitment)
+        pre_commitment
     }
 
     /// Receives pre-commitments of other parties and returns his revealed
@@ -149,7 +145,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
         private_key: &PrivateKey<E>,
         message: &[u8],
         rescue_params: &<E as RescueEngine>::Params,
-    ) -> Result<E::Fs, MusigError> {
+    ) -> Result<(E::Fs, E::Fs), MusigError> {
         // check that whether previous step passed or not
         if self.aggregated_commitment.is_none() {
             return Err(MusigError::NonceCommitmentsNotReceived);
@@ -173,14 +169,13 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
             rescue_params,
         );
 
-        self.challenge = Some(c);
         // s = r + c * a_i * x_i
         let mut s = c;
         s.mul_assign(&a_i);
         s.mul_assign(&private_key.0);
         s.add_assign(&r);
 
-        Ok(s)
+        Ok((s, c))
     }
 
     /// Receives signature shares and verifies them. If all signature shares
@@ -189,22 +184,18 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
     pub fn receive_signatures(
         &self,
         signature_shares: &[E::Fs],
+        challenge: &E::Fs,
     ) -> Result<Signature<E>, MusigError> {
-        // check that whether previous step passed or not
-        if self.challenge.is_none() {
-            return Err(MusigError::ChallengeNotGenerated);
-        }
-
         if signature_shares.len() != self.pubkeys.len() {
             return Err(MusigError::SignatureShareAndParticipantsNotMatch);
         }
 
-        let mut aggregated_signature = self.signature;
+        let mut aggregated_signature = E::Fs::zero();
         // s = \sum{1<=i<=n}{s_i}
         for (position, signature) in signature_shares.iter().enumerate() {
             // verify each signature share
             // s*G = R_i + (c * a_i) * X_i
-            self.verify_share(signature, position)?;
+            self.verify_share(signature, position, challenge)?;
             aggregated_signature.add_assign(&signature);
         }
 
@@ -218,10 +209,13 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
     }
 
     /// Verifies asignature share of a single party.
-    fn verify_share(&self, signature_share: &E::Fs, position: usize) -> Result<(), MusigError> {
-        let challenge = self.challenge.unwrap();
-
-        if !MuSigVerifier::verify_share(
+    fn verify_share(
+        &self,
+        signature_share: &E::Fs,
+        position: usize,
+        challenge: &E::Fs,
+    ) -> Result<(), MusigError> {
+        if MuSigVerifier::verify_share(
             signature_share,
             &self.nonce_commitments[position],
             &challenge,
@@ -229,8 +223,9 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
             &self.pubkeys[position],
             &self.jubjub_wrapper,
         ) {
-            return Err(MusigError::InvalidSignatureShare);
+            Ok(())
+        } else {
+            Err(MusigError::InvalidSignatureShare)
         }
-        Ok(())
     }
 }
