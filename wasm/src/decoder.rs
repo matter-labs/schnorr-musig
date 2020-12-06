@@ -148,15 +148,15 @@ mod tests {
             expected_privkeys.push(privkey);
         }
 
-        for i in 0..number_of_keys {
+        for privkey in expected_privkeys.iter().take(number_of_keys) {
             let mut encoded_privkey = vec![0u8; length_of_encoding_data];
-            expected_privkeys[i]
+            privkey
                 .0
                 .into_repr()
                 .write_be(&mut encoded_privkey[..])
                 .unwrap();
             let actual_privkey = Decoder::decode_private_key(&encoded_privkey).unwrap();
-            assert_eq!(expected_privkeys[i].0, actual_privkey.0);
+            assert_eq!(privkey.0, actual_privkey.0);
         }
 
         let actual_pubkeys = Decoder::decode_pubkey_list(&encoded_pubkeys).unwrap();

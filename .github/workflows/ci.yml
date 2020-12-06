@@ -19,7 +19,7 @@ jobs:
 
     - name: ts-lints
       run: |
-        cd wasm/typescript-example
+        cd wasm/typescript-musig
         yarn
         yarn lint
         yarn fmt --check
@@ -31,4 +31,4 @@ jobs:
       run: |
         cd wasm && ./build.sh
         wasm-pack test --release --node
-        cd typescript-example && yarn test
+        cd typescript-musig && yarn test

@@ -101,11 +101,11 @@ describe("Schnorr-MuSig", () => {
         // since all signatures are same we do not need to verify each of them.
         // verification of one of them is enough.
         // loop is redundant
-        const all_pubkeys = utils.concat(pubkeys);
+        const allPubkeys = utils.concat(pubkeys);
         for (let j = 0; j < NUM_MESSAGES; j++) {
             for (let i = 0; i < NUM_PARTICIPANTS; i++) {
-                const is_valid = MusigBN256WasmVerifier.verify(messages[j], all_pubkeys, aggregatedSignatures[j][i]);
-                expect(is_valid).to.be.true;
+                const valid = MusigBN256WasmVerifier.verify(messages[j], allPubkeys, aggregatedSignatures[j][i]);
+                expect(valid).to.be.true;
             }
         }
     });
