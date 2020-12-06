@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "downlevelIteration": true,
+        "outDir": "build",
+        "strict": true,
+        "esModuleInterop": true,
+        "noEmitOnError": true,
+        "declaration": true
+    },
+    "files": [
+        "src/signer.ts"
+    ]
+}

@@ -1,5 +1,5 @@
 {
-    "name": "schnorr-musig",
+    "name": "musig",
     "license": "MIT",
     "dependencies": {
         "ethers": "5.0.12",
