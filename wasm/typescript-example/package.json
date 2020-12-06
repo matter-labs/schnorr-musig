@@ -2,6 +2,7 @@
     "name": "schnorr-musig",
     "license": "MIT",
     "dependencies": {
+        "ethers": "5.0.12",
         "musig-bindings": "link:../musig-bindings",
         "zksync-crypto": "^0.3.2"
     },
@@ -14,13 +15,12 @@
         "prettier": "^2.1.1",
         "ts-node": "^9.0.0",
         "tslint": "^6.1.3",
-        "typescript": "^4.0.2",
-        "ethers": "5.0.12"
+        "typescript": "^4.0.2"
     },
     "scripts": {
         "build": "tsc -b",
         "clean": "rm -rf lib/*",
-        "test": "mocha -r ts-node/register test/*.test.ts --exit",
+        "test": "mocha --no-timeout -r ts-node/register test/*.test.ts --exit",
         "lint": "tslint -c tslint.json test/*.ts",
         "fmt": "prettier --tab-width 4 --print-width 120 --parser typescript --write test/*.ts"
     }

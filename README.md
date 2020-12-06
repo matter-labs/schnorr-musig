@@ -136,18 +136,11 @@ wasm-pack test --release --node
 
 ## TypeScript
 
-### Build
-
-```
-cd wasm/typescript-example
-yarn -D && yarn build
-```
-
 ### Test
 
 ```
 cd wasm/typescript-example
-yarn -D && yarn build && yarn test
+yarn && yarn test
 ```
 
 ### Example Code

@@ -30,4 +30,5 @@ jobs:
     - name: ts-tests
       run: |
         cd wasm && ./build.sh
+        wasm-pack test --release --node
         cd typescript-example && yarn test
