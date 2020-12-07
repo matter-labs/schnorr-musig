@@ -1,6 +1,9 @@
 {
     "name": "musig",
+    "main": "build/signer.js",
+    "types": "build/signer.d.ts",
     "license": "MIT",
+    "version": "0.1.0",
     "dependencies": {
         "ethers": "5.0.12",
         "musig-bindings": "link:../musig-bindings",
@@ -19,9 +22,9 @@
     },
     "scripts": {
         "build": "tsc -b",
-        "clean": "rm -rf lib/*",
+        "clean": "rm -rf build/*",
         "test": "mocha --no-timeout -r ts-node/register test/*.test.ts --exit",
-        "lint": "tslint -c tslint.json test/*.ts",
-        "fmt": "prettier --tab-width 4 --print-width 120 --parser typescript --write test/*.ts"
+        "lint": "tslint -c tslint.json {src,test}/*.ts",
+        "fmt": "prettier --tab-width 4 --print-width 120 --parser typescript --write {src,test}/*.ts"
     }
 }

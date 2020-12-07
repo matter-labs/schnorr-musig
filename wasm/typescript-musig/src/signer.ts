@@ -1,6 +1,6 @@
-import { MusigBN256WasmSigner, MusigBN256WasmAggregatedPubkey } from 'musig-bindings';
-import { utils, BytesLike } from 'ethers';
-import * as crypto from 'crypto';
+import { MusigBN256WasmSigner, MusigBN256WasmAggregatedPubkey } from "musig-bindings";
+import { utils, BytesLike } from "ethers";
+import * as crypto from "crypto";
 
 const LENGTH_IN_BYTES = 32;
 
@@ -32,7 +32,7 @@ export class MusigSigner {
         const result = this.signer.sign(utils.arrayify(privkey), utils.arrayify(message));
         const signatureShare = result.slice(0, LENGTH_IN_BYTES);
         const challenge = result.slice(LENGTH_IN_BYTES);
-        return { signatureShare, challenge }
+        return { signatureShare, challenge };
     }
 
     receiveSignatureShares(signature_shares: BytesLike[], challenge: BytesLike): Uint8Array {
