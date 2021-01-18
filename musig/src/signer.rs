@@ -52,7 +52,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
             signature: E::Fs::zero(),
             challenge: None,
             pubkeys: pubkeys.to_vec(),
-            jubjub_wrapper: jubjub_wrapper,
+            jubjub_wrapper,
         })
     }
   
@@ -134,7 +134,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
         for commitment in commitments {
             acc = self.jubjub_wrapper.add(&acc, &commitment);
         }
-        self.aggregated_commitment = Some(acc.clone());
+        self.aggregated_commitment = Some(acc);
         self.nonce_commitments = commitments.to_vec();
 
         Ok(acc)
@@ -159,7 +159,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
 
         let aggregated_pubkey = self.aggregated_pubkey.clone();
 
-        let a_i = self.a_values[self.position].clone();
+        let a_i = self.a_values[self.position];
 
         // c = H_sig(X', R, m)
         // this computes fiat-shamir challenge
@@ -172,7 +172,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
 
         self.challenge = Some(c);
         // s = r + c * a_i * x_i
-        let mut s = c.clone();
+        let mut s = c;
         s.mul_assign(&a_i);
         s.mul_assign(&private_key.0);
         s.add_assign(&r);
@@ -196,7 +196,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigSigner<E> {
             return Err(MusigError::SignatureShareAndParticipantsNotMatch);
         }
 
-        let mut aggregated_signature = self.signature.clone();
+        let mut aggregated_signature = self.signature;
         // s = \sum{1<=i<=n}{s_i}
         for (position, signature) in signature_shares.iter().enumerate() {
             // verify each signature share

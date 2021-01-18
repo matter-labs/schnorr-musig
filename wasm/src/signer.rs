@@ -131,7 +131,7 @@ impl MusigBN256WasmSigner {
         signature
             .s
             .into_repr()
-            .write_be(&mut encoded_sig[crate::decoder::STANDARD_ENCODING_LENGTH..])
+            .write_le(&mut encoded_sig[crate::decoder::STANDARD_ENCODING_LENGTH..])
             .map_err(|_| MusigABIError::EncodingError)?;
 
         Ok(encoded_sig)

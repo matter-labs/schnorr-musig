@@ -43,7 +43,7 @@ impl<E: JubjubEngine + RescueEngine> MuSigVerifier<E> {
     ) -> bool {
         // s_i * G = R_i + (c * a_i) * X_i
         let lhs = jubjub_wrapper.mul_by_generator(*signature_share);
-        let mut c_i = challenge.clone();
+        let mut c_i = *challenge;
         c_i.mul_assign(&a_i);
         let rhs = jubjub_wrapper.add(&jubjub_wrapper.mul(&pubkey.0, c_i), &R_i);
 

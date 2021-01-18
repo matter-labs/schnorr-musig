@@ -147,7 +147,7 @@ yarn -D && yarn build
 
 ```
 cd wasm/typescript-example
-yarn -D && yarn build && yarn test
+yarn -D && yarn test
 ```
 
 ### Example Code

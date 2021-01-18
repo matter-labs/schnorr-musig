@@ -141,7 +141,7 @@ fn musig_multi_party_test_runner<E: JubjubEngine + RescueEngine>(
         aggregated_commitments[position] = signer.receive_commitments(&commitments)?;
     }
 
-    let first_commitment = aggregated_commitments[0].clone();
+    let first_commitment = aggregated_commitments[0];
     aggregated_commitments
         .iter()
         .for_each(|commitment| assert!(first_commitment.eq(commitment)));
