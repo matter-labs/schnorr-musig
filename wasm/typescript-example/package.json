@@ -20,7 +20,7 @@
     "scripts": {
         "build": "tsc -b",
         "clean": "rm -rf lib/*",
-        "test": "mocha -r ts-node/register test/*.test.ts --exit",
+        "test": "mocha -r ts-node/register test/*.test.ts --exit --no-timeout",
         "lint": "tslint -c tslint.json test/*.ts",
         "fmt": "prettier --tab-width 4 --print-width 120 --parser typescript --write test/*.ts"
     }

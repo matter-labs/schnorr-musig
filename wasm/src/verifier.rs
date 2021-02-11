@@ -32,7 +32,7 @@ impl MusigBN256WasmVerifier {
         .unwrap();
 
         let mut repr = FsRepr::default();
-        repr.read_be(&encoded_signature[STANDARD_ENCODING_LENGTH..])
+        repr.read_le(&encoded_signature[STANDARD_ENCODING_LENGTH..])
             .unwrap();
         let sig_s = Fs::from_repr(repr).unwrap();
 
