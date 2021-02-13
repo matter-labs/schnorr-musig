@@ -1,0 +1,14 @@
+{
+    "name": "schnorr-musig",
+    "version": "0.1.0",
+    "browser": "dist/schnorr-musig-web.js",
+    "main": "dist/schnorr-musig-node.js",
+    "files": [
+        "dist/*.ts",
+        "dist/*.wasm",
+        "dist/*.js"
+    ],
+    "scripts": {
+        "build": "./build.sh && node web-wasm.js"
+    }
+}
