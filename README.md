@@ -1,5 +1,5 @@
 # Rust and Wasm Implementation of MuSig
-This is a Rust implementation of [MuSig](https://eprint.iacr.org/2018/068.pdf) scheme. It also contains generated wasm code and a [typescript-example](https://github.com/matter-labs/schnorr-musig/blob/master/wasm/typescript-example/test/example.test.ts) which illustrates full multi-party signing flow. 
+This is a Rust implementation of [MuSig](https://eprint.iacr.org/2018/068.pdf) scheme. It also contains generated wasm code and a [typescript-example](https://github.com/matter-labs/schnorr-musig/blob/master/wasm/example/test/example.test.ts) which illustrates full multi-party signing flow.
 
 ## MuSig 
 MuSig is effectively a multi-signature and key-aggregation scheme based on Schnorr Signatures. It provides security in plain public key model.  For overview one can visit [article written by Blockstream](https://blockstream.com/2018/01/23/en-musig-key-aggregation-schnorr-signatures/).
@@ -152,7 +152,7 @@ yarn -D && yarn test
 
 ### Example Code
 
-A working full round typescript example in a e2e fashion can be found [here](https://github.com/matter-labs/schnorr-musig/blob/master/wasm/typescript-example/test/example.test.ts)
+A working full round typescript example in a e2e fashion can be found [here](https://github.com/matter-labs/schnorr-musig/blob/master/wasm/example/test/example.test.ts)
 
 ## References
 
