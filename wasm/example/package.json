@@ -2,7 +2,7 @@
     "name": "schnorr-musig",
     "license": "MIT",
     "dependencies": {
-        "musig-bindings": "link:../musig-bindings",
+        "musig-bindings": "link:..",
         "zksync-crypto": "^0.3.2"
     },
     "devDependencies": {
